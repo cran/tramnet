@@ -1,0 +1,191 @@
+
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Tests for COLR models
+> 
+> ## Depencies
+> ## IGNORE_RDIFF_BEGIN
+> library("tramnet")
+Loading required package: tram
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: CVXR
+
+Attaching package: 'CVXR'
+
+The following object is masked from 'package:stats':
+
+    power
+
+Loading required package: mlrMBO
+Loading required package: mlr
+Loading required package: ParamHelpers
+Loading required package: smoof
+Loading required package: BBmisc
+
+Attaching package: 'BBmisc'
+
+The following object is masked from 'package:base':
+
+    isFALSE
+
+Loading required package: checkmate
+> library("survival")
+> library("sandwich")
+> ## IGNORE_RDIFF_END
+> options(digits = 3)
+> 
+> ## Exact and Right censored
+> data("GBSG2", package = "TH.data")
+> GBSG2$surv <- with(GBSG2, Surv(time, cens))
+> x <- matrix(1 * (GBSG2$horTh == "yes"), ncol = 1)
+> colnames(x) <- "horTh"
+> 
+> yCOLR <- Colr(surv ~ 1, data = GBSG2, log_first = TRUE, order = 10)
+> modCOLR <- tramnet(yCOLR, x, lambda = 0, alpha = 0)
+> yCOLRb <- Colr(surv ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
+> max(abs(coef(yCOLRb, with_baseline = FALSE) -
++         coef(modCOLR, with_baseline = FALSE)))
+[1] 0.000299
+> logLik(yCOLRb)
+'log Lik.' -2606 (df=12)
+> logLik(modCOLR)
+'log Lik.' -2606 (df=NA)
+> -modCOLR$result$value
+[1] -2606
+> logLik(modCOLR, newdata = tramnet:::.get_tramnet_data(modCOLR)[1:10, ])
+'log Lik.' -59 (df=NA)
+> 
+> ## methods
+> coef(modCOLR, tol = 0, with_baseline = TRUE)
+ Bs1(surv)  Bs2(surv)  Bs3(surv)  Bs4(surv)  Bs5(surv)  Bs6(surv)  Bs7(surv) 
+   -2.1049    -1.6329    -1.3265    -0.6752    -0.6752    -0.6752    -0.0956 
+ Bs8(surv)  Bs9(surv) Bs10(surv) Bs11(surv)      horTh 
+   -0.0196    -0.0196     0.4650     0.9569    -0.4795 
+> logLik(modCOLR)
+'log Lik.' -2606 (df=NA)
+> resid(modCOLR)[1:10]
+ [1]  0.0936 -0.0644 -0.6049 -0.1474 -0.3846 -0.7157  0.5014  0.6166 -0.6879
+[10]  0.5859
+> predict(modCOLR, type = "distribution", q = 1)[, 1:10]
+ [1] 4.92e-08 3.05e-08 3.05e-08 3.05e-08 4.92e-08 4.92e-08 3.05e-08 4.92e-08
+ [9] 4.92e-08 4.92e-08
+> predict(modCOLR, type = "quantile", prob = 0.5)[, 1:10]
+ [1] 1561 2166 2166 2166 1561 1561 2166 1561 1561 1561
+> head(simulate(modCOLR))
+Response []
+  Date: NULL
+  Status: 
+  Content-Type: <unknown>
+<EMPTY BODY>
+> head(estfun(modCOLR))
+     Bs1(surv) Bs2(surv) Bs3(surv) Bs4(surv) Bs5(surv) Bs6(surv) Bs7(surv)
+[1,]  1.92e-06  6.75e-05   0.00104   0.00931    0.0523   0.18927  0.424166
+[2,]  8.23e-08  4.32e-06   0.00010   0.00134    0.0114   0.06352  0.225441
+[3,]  1.11e-01  3.20e-01   0.28112  -0.10830   -0.4408  -0.43257 -0.236106
+[4,]  2.09e-06  7.23e-05   0.00110   0.00966    0.0533   0.18843  0.408451
+[5,]  7.30e-02  2.79e-01   0.39193   0.13843   -0.2838  -0.46049 -0.335369
+[6,]  8.86e-01 -6.62e-01  -0.67059  -0.22353   -0.0411  -0.00475 -0.000363
+     Bs8(surv) Bs9(surv) Bs10(surv) Bs11(surv)   horTh
+[1,]  4.96e-01  3.00e-02  -6.09e-01  -4.99e-01  0.0000
+[2,]  4.63e-01  3.59e-01  -4.14e-01  -7.74e-01 -0.0644
+[3,] -8.00e-02 -1.68e-02  -2.01e-03  -1.06e-04 -0.6049
+[4,]  4.42e-01 -5.72e-02  -6.78e-01  -5.16e-01 -0.1474
+[5,] -1.44e-01 -3.77e-02  -5.57e-03  -3.59e-04  0.0000
+[6,] -1.84e-05 -5.96e-07  -1.13e-08  -9.43e-11  0.0000
+> plot(modCOLR, type = "survivor")
+> plot(modCOLR, type = "density", K = 120)
+> print(modCOLR)
+
+Call:
+tramnet(model = yCOLR, x = x, lambda = 0, alpha = 0)
+
+Convergence:  optimal
+Type:   Continuous Outcome Logistic Regression
+Log-Likelihood:  -2606
+
+Coefficients:
+horTh 
+-0.48 
+
+Sparsity:  1 regression coefficients, 1 of which are non-zero 
+
+Tuning parameters:
+lambda  alpha 
+     0      0 
+
+
+> 
+> 
+> if (FALSE) {
++   ## left censored
++   GBSG2$cens <- as.integer(GBSG2$cens)
++   GBSG2$cens[GBSG2$time < 200] <- 2
++   GBSG2$time[GBSG2$cens == 2] <- 100
++ 
++   yCOLR <- Colr(Surv(time, time, cens, type = "interval") ~ 1, data = GBSG2, log_first = TRUE, order = 10)
++   modCOLR <- tramnet(yCOLR, x, lambda = 0, alpha = 0)
++   yCOLRb <- Colr(Surv(time, time, cens, type = "interval") ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
++   max(abs(coef(yCOLRb, with_baseline = FALSE) -
++           coef(modCOLR, with_baseline = FALSE)))
++   logLik(yCOLRb)
++   logLik(modCOLR)
++ 
++   ## methods
++   coef(modCOLR, tol = 0, with_baseline = TRUE)
++   logLik(modCOLR)
++   resid(modCOLR)[1:10]
++   predict(modCOLR, type = "distribution", q = 1)[, 1:10]
++   predict(modCOLR, type = "quantile", prob = 0.5)[, 1:10]
++   head(simulate(modCOLR))
++   head(estfun(modCOLR))
++   plot(modCOLR, type = "survivor")
++   plot(modCOLR, type = "density", K = 120)
++   print(modCOLR)
++ 
++   ## Unconditional, stratified
++   yCOLR <- Colr(surv | horTh ~ 1, data = GBSG2)
++   modCOLR <- tramnet(yCOLR, x = matrix(0, nrow = nrow(GBSG2)), lambda = 0, alpha = 0)
++   logLik(yCOLR)
++   logLik(modCOLR)
++   resid(modCOLR)[1:10]
++   predict(modCOLR, type = "distribution", q = 1)[, 1:10]
++   predict(modCOLR, type = "quantile", prob = 0.5)[, 1:10]
++   head(simulate(modCOLR))
++   head(estfun(modCOLR))
++   plot(modCOLR, type = "survivor")
++   plot(modCOLR, type = "density", K = 120)
++   print(modCOLR)
++ 
++ 
++   ## interval censored
++   GBSG2$time2 <- GBSG2$time + 50
++   GBSG2$cens[which(GBSG2$cens == 1)[1:100]] <- 3
++ 
++   yCOLR <- Colr(Surv(time, time2, cens, type = "interval") ~ 1, data = GBSG2, log_first = TRUE, order = 10)
++   modCOLR <- tramnet(yCOLR, x, lambda = 0, alpha = 0)
++   yCOLRb <- Colr(Surv(time, time2, cens, type = "interval") ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
++   max(abs(coef(yCOLRb, with_baseline = FALSE) -
++             coef(modCOLR, with_baseline = FALSE)))
++   logLik(yCOLRb)
++   logLik(modCOLR)
++ }
+> 
+> proc.time()
+   user  system elapsed 
+ 14.052   0.432  14.485 

@@ -167,8 +167,16 @@ print_mbo(tmbo)
 coef(mtmbo)
 summary(mtmbo)$sparsity
 
-## ----profiling-----------------------------------------------------------
-pfl <- prof_lambda(mt)
+## ----profiling, eval=FALSE-----------------------------------------------
+#  pfl <- prof_lambda(mt)
+
+## ----load_from_dat2, echo=FALSE------------------------------------------
+if (file.exists("cache2.rda")) {
+    load("cache2.rda")
+} else {
+  pfl <- prof_lambda(mt)
+  save(pfl, file = "cache2.rda")
+}
 
 ## ----profplotcode, eval=FALSE, echo=TRUE---------------------------------
 #  plot_path(pfl, plot_logLik = FALSE, las = 1, col = coll)

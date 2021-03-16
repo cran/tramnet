@@ -54,6 +54,7 @@ library("penalized")
 library("glmnet")
 library("mvtnorm")
 library("Matrix")
+library("coin")
 
 ## ----eval=FALSE----------------------------------------------------------
 #  m1 <- tram(y | s ~ 1, ...)
@@ -133,9 +134,9 @@ kableExtra::add_header_above(kbl, header = c("Model" = 1, "Coefficient estimates
                                              "logLik" = 1), escape = FALSE,
                              bold = TRUE)
 
-## ----cvl_prof_setup------------------------------------------------------
-m0 <- BoxCox(lpsa ~ 1, data = Prostate, order = 7, extrapolate = TRUE)
-mt <- tramnet(m01, x = x, alpha = 1, lambda = 0)
+## ----cvl_prof_setup, eval=FALSE------------------------------------------
+#  m0 <- BoxCox(lpsa ~ 1, data = Prostate, order = 7, extrapolate = TRUE)
+#  mt <- tramnet(m01, x = x, alpha = 1, lambda = 0)
 
 ## ----cvl_tramnet, eval=FALSE---------------------------------------------
 #  lambdas <- c(0, 10^seq(-4, log10(15), length.out = 4))
@@ -174,6 +175,8 @@ summary(mtmbo)$sparsity
 if (file.exists("cache2.rda")) {
     load("cache2.rda")
 } else {
+  m0 <- BoxCox(lpsa ~ 1, data = Prostate, order = 7, extrapolate = TRUE)
+  mt <- tramnet(m01, x = x, alpha = 1, lambda = 0)
   pfl <- prof_lambda(mt)
   save(pfl, file = "cache2.rda")
 }
@@ -239,15 +242,32 @@ simulate(mtmbo, nsim = 1, newdata = Prostate[1:5,], seed = 1)
 ## ----residuals_method----------------------------------------------------
 residuals(mtmbo)[1:5]
 
-## ----coin_illustration---------------------------------------------------
-library("coin")
-m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
-x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
-mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
-r <- residuals(mt_no_age_lcp)
-it <- independence_test(r ~ age + lcp, data = Prostate,
-                        teststat = "max", distribution = approximate(1e6))
-pvalue(it, "single-step")
+## ----coin_illustration, eval=FALSE---------------------------------------
+#  library("coin")
+#  m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
+#  x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
+#  mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
+#  r <- residuals(mt_no_age_lcp)
+#  it <- independence_test(r ~ age + lcp, data = Prostate,
+#                          teststat = "max", distribution = approximate(1e6))
+#  pvalue(it, "single-step")
+
+## ----load_from_dat3, echo=FALSE------------------------------------------
+if (file.exists("cache3.rda")) {
+    load("cache3.rda")
+} else {
+  library("coin")
+  m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
+  x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
+  mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
+  r <- residuals(mt_no_age_lcp)
+  it <- independence_test(r ~ age + lcp, data = Prostate,
+                          teststat = "max", distribution = approximate(1e6))
+  pvalue(it, "single-step")
+  tmp <- pvalue(it, "single-step")
+  save(tmp, file = "cache3.rda")
+}
+tmp
 
 ## ----packages, echo = FALSE, results = "hide"----------------------------
 if (file.exists("packages.bib")) file.remove("packages.bib")

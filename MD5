@@ -1,4 +1,4 @@
-49596fdd157a78cc277b9a7ccc6a5859 *DESCRIPTION
+7e225d561d4747547f91b5541257a8a4 *DESCRIPTION
 d75da888e8ed54437c2ea2f832d9c327 *NAMESPACE
 84fa22c8e0d31b4c07c468d37337564e *R/cvl_tramnet.R
 91db2a2e382aa23345eeb801f793ad2f *R/methods.R
@@ -8,9 +8,9 @@ c16ab1bfcefb560781ba2fc85d746ba4 *R/prof_lambda.R
 97d5e72e74743901e41ed85ed3e86851 *build/vignette.rds
 1c9695dee7162d6e72883b552906e753 *cleanup
 42a7e06e4af27c32d7767d070cea7aaf *inst/NEWS.Rd
-47d5389267f46e1bf4f5d77f031ac59b *inst/doc/tramnet.R
-313e7a280b83c10e85b4afef164c2371 *inst/doc/tramnet.Rnw
-eb0200b8391f2791ccd2670def9321a5 *inst/doc/tramnet.pdf
+71aeb26b42743e464c49ae54226256b0 *inst/doc/tramnet.R
+3ad0629280b2f620e26cf501833f7072 *inst/doc/tramnet.Rnw
+8484d7352bdc6eb7c8799a06af0ed7f1 *inst/doc/tramnet.pdf
 b7b8ed4d5d4c27bd48ea48d26faeffa0 *man/coef.tramnet.Rd
 02d4b7faacfe7c31b6c78f9f20a19919 *man/coef.tramnet_Lm.Rd
 e1aa2864746d2f8d49b115ca403ad578 *man/cvl_tramnet.Rd
@@ -32,10 +32,11 @@ ac2451deb1cea66f30ccce9560d178ba *man/ridge_obj.Rd
 4555dde9cf7482b82e1041caa6fb2b5f *man/simulate.tramnet.Rd
 bdbcd01acc1d3036e5f222d706294df3 *man/summary.tramnet.Rd
 9adf4a0a60dabefdcb3aa270918812a4 *man/tramnet.Rd
-40a1654b3c4d8ba422316cb85c0f65b8 *tests/Colr-pen.R
-bb6b4ffed55ca1c333c6a22f69e9ecc8 *tests/Colr-pen.Rout.save
+9dd2c92884483f48fe61551a53597ac3 *tests/Colr-pen.R
+a43d4f0e23e3cfb007bbe54942a4884c *tests/Colr-pen.Rout.save
 c3b3e82683f2e70a38d998ea23a69e32 *vignettes/RJournal.sty
 ff900f701870593683b566b66ec8c558 *vignettes/cache.rda
 5a15d9a9037f1b8f17d5e7a5868fc0d9 *vignettes/cache2.rda
+f00d59abdde996caab8155f357b303b7 *vignettes/cache3.rda
 716256d93a102bd1f09bd90db6b8dd8a *vignettes/kook-hothorn.bib
-313e7a280b83c10e85b4afef164c2371 *vignettes/tramnet.Rnw
+3ad0629280b2f620e26cf501833f7072 *vignettes/tramnet.Rnw

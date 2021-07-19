@@ -1,4 +1,4 @@
-7e225d561d4747547f91b5541257a8a4 *DESCRIPTION
+e940532794da962672b7d7a06279c983 *DESCRIPTION
 d75da888e8ed54437c2ea2f832d9c327 *NAMESPACE
 84fa22c8e0d31b4c07c468d37337564e *R/cvl_tramnet.R
 91db2a2e382aa23345eeb801f793ad2f *R/methods.R
@@ -10,7 +10,7 @@ c16ab1bfcefb560781ba2fc85d746ba4 *R/prof_lambda.R
 42a7e06e4af27c32d7767d070cea7aaf *inst/NEWS.Rd
 71aeb26b42743e464c49ae54226256b0 *inst/doc/tramnet.R
 3ad0629280b2f620e26cf501833f7072 *inst/doc/tramnet.Rnw
-8484d7352bdc6eb7c8799a06af0ed7f1 *inst/doc/tramnet.pdf
+bdd33b99248ee91d0857c0005f43b815 *inst/doc/tramnet.pdf
 b7b8ed4d5d4c27bd48ea48d26faeffa0 *man/coef.tramnet.Rd
 02d4b7faacfe7c31b6c78f9f20a19919 *man/coef.tramnet_Lm.Rd
 e1aa2864746d2f8d49b115ca403ad578 *man/cvl_tramnet.Rd

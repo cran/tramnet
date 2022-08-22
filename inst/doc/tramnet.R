@@ -65,7 +65,7 @@ library("coin")
 #  mt <- tramnet(model = m1, x = x_scaled, lambda, alpha, ...)
 
 ## ----BostonHousing2_data-------------------------------------------------
-data("Prostate", package = "lasso2")
+load("Prostate.rda")
 Prostate$psa <- exp(Prostate$lpsa)
 Prostate[, 1:8] <- scale(Prostate[, 1:8])
 

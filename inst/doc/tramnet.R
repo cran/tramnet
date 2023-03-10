@@ -1,4 +1,4 @@
-## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
+## ----setup, echo = FALSE, results = "hide", message = FALSE, warning=FALSE----
 set.seed(241068)
 
 knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
@@ -13,16 +13,6 @@ knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 ## R settings
 options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 options(width = 75, digits = 3)
-
-# lattice theme for vignette and publication
-
-library("lattice")
-library("colorspace")
-
-# Colors
-
-col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
-fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
 
 .cmp <- function(x, y) {
   ret <- cbind(x, y, x - y, (x - y) / x)
@@ -48,13 +38,17 @@ print_mbo <- function(x, ...) {
 }
 
 # Dependencies
-
 library("tramnet")
-library("penalized")
-library("glmnet")
-library("mvtnorm")
-library("Matrix")
-library("coin")
+pkgs <- c("penalized", "glmnet", "mvtnorm", "Matrix", "coin", "kableExtra",
+          "lattice", "colorspace")
+av <- !any(!sapply(pkgs, \(x) require(x, character.only = TRUE)))
+
+# Colors
+if (av) {
+  col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
+  fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
+}
+
 
 ## ----eval=FALSE----------------------------------------------------------
 #  m1 <- tram(y | s ~ 1, ...)
@@ -69,35 +63,35 @@ load("Prostate.rda")
 Prostate$psa <- exp(Prostate$lpsa)
 Prostate[, 1:8] <- scale(Prostate[, 1:8])
 
-## ----BH_Linear1----------------------------------------------------------
+## ----BH_Linear1, eval=av-------------------------------------------------
 fm_Pr <- psa ~ lcavol + lweight + age + lbph + svi + lcp + gleason + pgg45
 fm_Pr1 <- update(fm_Pr, ~ 0 + .)
 x <- model.matrix(fm_Pr1, data = Prostate)
 
-## ----BH_Linear2, results='hide'------------------------------------------
+## ----BH_Linear2, results='hide', eval=av---------------------------------
 m0 <- Lm(lpsa ~ 1, data = Prostate)
 mt <- tramnet(m0, x = x, alpha = 0, lambda = 0)
 mp <- penalized(response = Prostate$lpsa, penalized = x,
                 lambda1 = 0, lambda2 = 0)
 
-## ----BH_Linear3----------------------------------------------------------
+## ----BH_Linear3, eval=av-------------------------------------------------
 cfx_tramnet <- coef(mt, as.lm = TRUE)
 
-## ----BH_BoxCox1----------------------------------------------------------
+## ----BH_BoxCox1, eval=av-------------------------------------------------
 ord <- 7 # flexible baseline transformation
 m01 <- BoxCox(psa ~ 1, data = Prostate, order = ord,
               extrapolate = TRUE, log_first = TRUE)
 mt1 <- tramnet(m01, x = x, alpha = 0, lambda = 0)
 
-## ----Prostate_baseline_trafo---------------------------------------------
+## ----Prostate_baseline_trafo, eval=av------------------------------------
 m02 <- BoxCox(psa ~ 1, order = 11, data = Prostate, extrapolate = TRUE)
 mt2 <- tramnet(m02, x = x, lambda = 0, alpha = 0)
 
-## ----linear_boxcox-------------------------------------------------------
+## ----linear_boxcox, eval=av----------------------------------------------
 m0p <- BoxCox(psa ~ 1, order = 1, data = Prostate, log_first = TRUE)
 mtp <- tramnet(m0p, x = x, lambda = 0, alpha = 0)
 
-## ----BH_Linear5, echo=FALSE, fig.height=3, fig.width=5-------------------
+## ----BH_Linear5, echo=FALSE, fig.height=3, fig.width=5, eval=av----------
 K <- 1e3
 nd <- Prostate[rep(1, K),]
 nd$lpsa <- seq(min(Prostate$lpsa), max(Prostate$lpsa), length.out = K)
@@ -123,7 +117,7 @@ xyplot(pred1 + pred2 + pred3 ~ lpsa, data = nd, type = "l", lwd = 1.5,
                                                  top.padding = 0))
        )
 
-## ----table1, results='asis', echo=FALSE----------------------------------
+## ----table1, results='asis', echo=FALSE, eval=av-------------------------
 cfx_tab <- as.data.frame(rbind(coef(mp, which = "penalized"), coef(mt), coef(mtp),
                                coef(mt1), coef(mt2)))
 cfx_tab$` ` <- c(loglik(mp), logLik(mt), logLik(mtp), logLik(mt1), logLik(mt2))
@@ -161,17 +155,17 @@ if (file.exists("cache.rda")) {
   save(tmbo, mtmbo, file = "cache.rda")
 }
 
-## ----prostate_mbo_recommended--------------------------------------------
+## ----prostate_mbo_recommended, eval=av-----------------------------------
 print_mbo(tmbo)
 
-## ----prostate_coefs------------------------------------------------------
+## ----prostate_coefs, eval=av---------------------------------------------
 coef(mtmbo)
 summary(mtmbo)$sparsity
 
 ## ----profiling, eval=FALSE-----------------------------------------------
 #  pfl <- prof_lambda(mt)
 
-## ----load_from_dat2, echo=FALSE------------------------------------------
+## ----load_from_dat2, echo=FALSE, eval=av---------------------------------
 if (file.exists("cache2.rda")) {
     load("cache2.rda")
 } else {
@@ -184,30 +178,30 @@ if (file.exists("cache2.rda")) {
 ## ----profplotcode, eval=FALSE, echo=TRUE---------------------------------
 #  plot_path(pfl, plot_logLik = FALSE, las = 1, col = coll)
 
-## ----plot_setup, include=FALSE, echo=FALSE-------------------------------
+## ----plot_setup, include=FALSE, echo=FALSE, eval=av----------------------
 coll <- qualitative_hcl(n = ncol(pfl$cfx))
 
-## ----profiling_plot, fig.height=4, fig.width=6.5, out.width="1\\textwidth", echo=FALSE----
+## ----profiling_plot, fig.height=4, fig.width=6.5, out.width="1\\textwidth", echo=FALSE, eval=av----
 plot_path(pfl, plot_logLik = FALSE, las = 1, col = coll)
 
-## ----addconst------------------------------------------------------------
+## ----addconst, eval=av---------------------------------------------------
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
 mt <- tramnet(m0, x, alpha = 0, lambda = 0, constraints = list(diag(8),
                                                                rep(0, 8)))
 coef(mt)
 
-## ----addconst_sparsity---------------------------------------------------
+## ----addconst_sparsity, eval=av------------------------------------------
 summary(mt)$sparsity
 
-## ----addconst_tram_cmp---------------------------------------------------
+## ----addconst_tram_cmp, eval=av------------------------------------------
 m <- BoxCox(lpsa ~ . - psa, data = Prostate, extrapolate = TRUE,
             constraints = c("age >= 0", "lcp >= 0"))
 max(abs(coef(m) - coef(mt, tol = 0)))
 
-## ----coef_method---------------------------------------------------------
+## ----coef_method, eval=av------------------------------------------------
 coef(mtmbo, with_baseline = TRUE, tol = 0)
 
-## ----logLik_method-------------------------------------------------------
+## ----logLik_method, eval=av----------------------------------------------
 logLik(mtmbo)
 cfx <- coef(mtmbo, with_baseline = TRUE, tol = 0)
 cfx[5:8] <- 0.5
@@ -215,17 +209,12 @@ logLik(mtmbo, parm = cfx)
 logLik(mtmbo, newdata = Prostate[1:10,])
 logLik(mtmbo, w = runif(n = nrow(mtmbo$x)))
 
-## ----plot_method_chunk, fig.height=7, fig.width=5, eval=FALSE------------
-#  par(mfrow = c(3, 2)); K <- 1e3
-#  plot(mtmbo, type = "distribution", K = K, main = "A") # A, default
-#  plot(mtmbo, type = "survivor", K = K, main = "B") # B
-#  plot(mtmbo, type = "trafo", K = K, main = "C") # C
-#  plot(mtmbo, type = "density", K = K, main = "D") # D
-#  plot(mtmbo, type = "hazard", K = K, main = "E") # E
-#  plot(mtmbo, type = "trafo", newdata = Prostate[1, ], col = 1, K = K, main = "F") # F
+## ----include=FALSE, eval=FALSE-------------------------------------------
+#  mtmbo$model$data <- mtmbo$model$data[1:10,,drop=FALSE]
+#  mtmbo$x <- mtmbo$x[1:10,,drop=FALSE]
 
-## ----plot_method_fig, fig.height=7, fig.width=5, echo=FALSE--------------
-par(mfrow = c(3, 2)); K <- 1e3
+## ----plot_method_chunk, fig.height=7, fig.width=5, eval=FALSE, eval=av----
+par(mfrow = c(3, 2)); K <- 3e2
 plot(mtmbo, type = "distribution", K = K, main = "A") # A, default
 plot(mtmbo, type = "survivor", K = K, main = "B") # B
 plot(mtmbo, type = "trafo", K = K, main = "C") # C
@@ -233,24 +222,33 @@ plot(mtmbo, type = "density", K = K, main = "D") # D
 plot(mtmbo, type = "hazard", K = K, main = "E") # E
 plot(mtmbo, type = "trafo", newdata = Prostate[1, ], col = 1, K = K, main = "F") # F
 
-## ----predict_method------------------------------------------------------
+## ----plot_method_fig, fig.height=7, fig.width=5, echo=FALSE, eval=av-----
+par(mfrow = c(3, 2)); K <- 3e2
+plot(mtmbo, type = "distribution", K = K, main = "A") # A, default
+plot(mtmbo, type = "survivor", K = K, main = "B") # B
+plot(mtmbo, type = "trafo", K = K, main = "C") # C
+plot(mtmbo, type = "density", K = K, main = "D") # D
+plot(mtmbo, type = "hazard", K = K, main = "E") # E
+plot(mtmbo, type = "trafo", newdata = Prostate[1, ], col = 1, K = K, main = "F") # F
+
+## ----predict_method, eval=av---------------------------------------------
 predict(mtmbo, type = "quantile", prob = 0.2, newdata = Prostate[1:5,])
 
-## ----simulate_method-----------------------------------------------------
+## ----simulate_method, eval=av--------------------------------------------
 simulate(mtmbo, nsim = 1, newdata = Prostate[1:5,], seed = 1)
 
-## ----residuals_method----------------------------------------------------
+## ----residuals_method, eval=av-------------------------------------------
 residuals(mtmbo)[1:5]
 
-## ----coin_illustration, eval=FALSE---------------------------------------
-#  library("coin")
-#  m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
-#  x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
-#  mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
-#  r <- residuals(mt_no_age_lcp)
-#  it <- independence_test(r ~ age + lcp, data = Prostate,
-#                          teststat = "max", distribution = approximate(1e6))
-#  pvalue(it, "single-step")
+## ----coin_illustration, eval=FALSE, eval=av------------------------------
+library("coin")
+m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
+x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
+mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
+r <- residuals(mt_no_age_lcp)
+it <- independence_test(r ~ age + lcp, data = Prostate,
+                        teststat = "max", distribution = approximate(1e6))
+pvalue(it, "single-step")
 
 ## ----load_from_dat3, echo=FALSE------------------------------------------
 if (file.exists("cache3.rda")) {
@@ -269,7 +267,7 @@ if (file.exists("cache3.rda")) {
 }
 tmp
 
-## ----packages, echo = FALSE, results = "hide"----------------------------
+## ----packages, echo = FALSE, results = "hide", eval=av-------------------
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)

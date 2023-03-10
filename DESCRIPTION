@@ -1,10 +1,10 @@
 Package: tramnet
 Title: Penalized Transformation Models
-Version: 0.0-7
-Date: 2022-08-22
+Version: 0.0-8
+Date: 2023-03-10
 URL: http://ctm.R-forge.R-project.org
 Authors@R: c(person("Lucas", "Kook", role = c("cre", "aut"),
-                    email = "lucasheinrich.kook@uzh.ch"),
+                    email = "lucasheinrich.kook@gmail.com"),
              person("Balint", "Tamasi", role = "ctb"),
              person("Sandra", "Siegfried", role = "ctb"),
              person("Samuel", "Pawel", role = "ctb"),
@@ -31,12 +31,12 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL-2
 NeedsCompilation: no
-Packaged: 2022-08-22 12:13:20 UTC; stigler
+Packaged: 2023-03-10 17:16:47 UTC; stigler
 Author: Lucas Kook [cre, aut],
   Balint Tamasi [ctb],
   Sandra Siegfried [ctb],
   Samuel Pawel [ctb],
   Torsten Hothorn [ctb] (<https://orcid.org/0000-0001-8301-0471>)
-Maintainer: Lucas Kook <lucasheinrich.kook@uzh.ch>
+Maintainer: Lucas Kook <lucasheinrich.kook@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-08-22 13:50:02 UTC
+Date/Publication: 2023-03-10 21:50:02 UTC
